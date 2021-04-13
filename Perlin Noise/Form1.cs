@@ -15,27 +15,9 @@ namespace Perlin_Noise
         {
             InitializeComponent();
 
-            for (int i = 0; i < layer1.Length; i += 20)
-            {
-                layer1[i] = rand.Next(-50, 50 + 1);
-                WriteLog($"Layer 1: x {i} || y " + layer1[i]);
-            }
-
-            for (int i = 0; i < layer2.Length; i += 10)
-            {
-                layer2[i] = rand.Next(-25, 25 + 1);
-                WriteLog($"Layer 2: x {i} || y " + layer2[i]);
-            }
-
-            for (int i = 0; i < layer3.Length; i += 5)
-            {
-                layer3[i] = rand.Next(-12, 12 + 1);
-                WriteLog($"Layer 3: x {i} || y " + layer3[i]);
-            }
-
-            Layer(20, layer1);
-            Layer(10, layer2);
-            Layer(5, layer3);
+            Layer(20, layer1, -50, 50, "Layer 1");
+            Layer(10, layer2, -25, 25, "Layer 2");
+            Layer(5, layer3, -12, 12, "Layer 3");
 
             for (int i = 0; i < layerNoise.Length; i++)
             {
@@ -44,8 +26,14 @@ namespace Perlin_Noise
 
         }
 
-        public void Layer(int abstand_in_px, float[] arrayName)
+        public void Layer(int abstand_in_px, float[] arrayName, int min, int max, string displayName)
         {
+            for (int i = 0; i < arrayName.Length; i += abstand_in_px)
+            {
+                arrayName[i] = rand.Next(min, max + 1);
+                WriteLog($"{displayName}: x {i} || y " + arrayName[i]);
+            }
+
             int x = 1;
             int x0 = 0;
             int x1 = abstand_in_px;
@@ -83,31 +71,18 @@ namespace Perlin_Noise
 
             e.Graphics.DrawLine(normalPen, 0, yMid, pnAnzeige.Width, yMid);
 
+            DrawCurve(layer1, 3, markerPen1, e);
+            DrawCurve(layer2, 3, markerPen2, e);
+            DrawCurve(layer3, 3, markerPen3, e);
+            DrawCurve(layerNoise, 3, markerPenFinal, e);
+        }
+
+        public void DrawCurve(float[] arrayName, float scale, Pen pen, PaintEventArgs e)
+        {
             int x = 0;
-            for (int i = 1; i < layer1.Length * 3 - 3; i += 3)
+            for (float i = 1; i < arrayName.Length * scale - scale; i += scale)
             {
-                e.Graphics.DrawLine(markerPen1, i, yMid + layer1[x], i + 3, yMid + layer1[x + 1]);
-                x++;
-            }
-
-            x = 0;
-            for (int i = 1; i < layer2.Length * 3 - 3; i += 3)
-            {
-                e.Graphics.DrawLine(markerPen2, i, yMid + layer2[x], i + 3, yMid + layer2[x + 1]);
-                x++;
-            }
-
-            x = 0;
-            for (int i = 1; i < layer3.Length * 3 - 3; i += 3)
-            {
-                e.Graphics.DrawLine(markerPen3, i, yMid + layer3[x], i + 3, yMid + layer3[x + 1]);
-                x++;
-            }
-
-            x = 0;
-            for (int i = 1; i < layerNoise.Length * 3 - 3; i += 3)
-            {
-                e.Graphics.DrawLine(markerPenFinal, i, yMid + layerNoise[x], i + 3, yMid + layerNoise[x + 1]);
+                e.Graphics.DrawLine(pen, i, yMid + arrayName[x], i + scale, yMid + arrayName[x + 1]);
                 x++;
             }
         }
@@ -116,12 +91,7 @@ namespace Perlin_Noise
         {
             e.Graphics.DrawLine(normalPen, 0, yMid, pnAnzeige.Width, yMid);
 
-            int x = 0;
-            for (int i = 1; i < layerNoise.Length * 3 - 3; i += 3)
-            {
-                e.Graphics.DrawLine(markerPenFinal, i, yMid + layerNoise[x], i + 3, yMid + layerNoise[x + 1]);
-                x++;
-            }
+            DrawCurve(layerNoise, 3, markerPenFinal, e);
         }
 
         private void btnArray_Click(object sender, EventArgs e)
