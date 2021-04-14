@@ -60,11 +60,17 @@ namespace Perlin_Noise
         }
 
         int yMid = 50;
+        static int zoomScale = 3;
         Pen normalPen = new Pen(Color.White);
         Pen markerPen1 = new Pen(Color.Red);
         Pen markerPen2 = new Pen(Color.Cyan);
         Pen markerPen3 = new Pen(Color.Yellow);
         Pen markerPenFinal = new Pen(Color.YellowGreen, 3);
+
+        Pen waterPen = new Pen(Color.CornflowerBlue, zoomScale);
+        Pen dirtPen = new Pen(Color.FromArgb(150, 75, 0) , zoomScale);
+        Pen sandPen = new Pen(Color.BurlyWood, zoomScale);
+        Pen grassPen = new Pen(Color.YellowGreen, zoomScale);
         private void pnAnzeige_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
@@ -87,11 +93,45 @@ namespace Perlin_Noise
             }
         }
 
+        public void DrawEdgeLine(Pen pen, string position, PaintEventArgs e)
+        {
+            int x = 0;
+            for (int i = 0; i < layerNoise.Length * zoomScale - zoomScale; i += zoomScale)
+            {
+                if (layerNoise[x] + yMid >= yMid && position=="down")
+                {
+                    e.Graphics.DrawLine(pen, i, yMid + layerNoise[x], i + 3, yMid + layerNoise[x + 1]);
+                }
+                if (layerNoise[x] + yMid <= yMid && position == "top")
+                {
+                    e.Graphics.DrawLine(pen, i, yMid + layerNoise[x], i + 3, yMid + layerNoise[x + 1]);
+                }
+                x++;
+            }
+        }
+
         private void pnAnzeigeTerrain_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.DrawLine(normalPen, 0, yMid, pnAnzeige.Width, yMid);
+            int x = 0;
+            for (int i = 0; i < layerNoise.Length * 3 - 3; i += 3)
+            {
+                if (layerNoise[x] + yMid >= yMid)
+                {
+                    e.Graphics.DrawLine(waterPen, i, yMid, i, yMid + layerNoise[x]);
+                }
+                if (layerNoise[x] + yMid <= yMid)
+                {
+                }
+                e.Graphics.DrawLine(dirtPen, i, yMid + layerNoise[x], i, 100);
+                x++;
+            }
 
-            DrawCurve(layerNoise, 3, markerPenFinal, e);
+            DrawEdgeLine(sandPen, "down", e);
+            DrawEdgeLine(grassPen, "top", e);
+
+            //e.Graphics.DrawLine(normalPen, 0, yMid, pnAnzeige.Width, yMid);
+
+            //DrawCurve(layerNoise, 3, markerPenFinal, e);
         }
 
         private void btnArray_Click(object sender, EventArgs e)
